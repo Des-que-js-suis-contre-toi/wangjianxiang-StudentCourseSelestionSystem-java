@@ -17,9 +17,12 @@ public class Course {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("课程名称不能为空");
         }
-        if (credit < 1.0 || credit > 4.0 || Math.abs(credit * 2 - Math.round(credit * 2)) > 1e-9) {
-            throw new IllegalArgumentException("学分必须在 1.0—4.0 之间且以 0.5 为步进：" + credit);
+        if (credit < 1.0 || credit > 4.0) {
+            throw new IllegalArgumentException("学分必须在 1.0—4.0 之间：" + credit);
         }
+        if (credit * 2 != Math.round(credit * 2)) { 
+            throw new IllegalArgumentException("学分必须以 0.5 为步进：" + credit);
+}
         if (capacity < 30 || capacity > 60) {
             throw new IllegalArgumentException("容量必须在 30—60之间：" + capacity);
         }
@@ -100,7 +103,6 @@ public class Course {
     }
 
 
-// 在 hashCode 里用可变字段。 对象进 HashSet 后再改字段，等于“人间蒸发”
     @Override
     public int hashCode() {
         return Objects.hash(id);

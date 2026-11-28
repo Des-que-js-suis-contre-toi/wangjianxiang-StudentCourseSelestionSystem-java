@@ -8,16 +8,7 @@ import course.service.EnrollmentException;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * 控制台界面：只做输入解析和打印，业务规则全部委托给 CourseService。
- *
- * <p>两个容易被扣分的细节已经在这里处理好：
- * <ul>
- *   <li>输入流结束（Ctrl+Z / 管道输入读完）时 hasNextLine 返回 false，按“退出”处理，
- *       不会死循环刷屏，也不会抛 NoSuchElementException；</li>
- *   <li>所有用户输入都先 trim，空输入直接当取消处理。</li>
- * </ul>
- */
+
 public class ConsoleApp {
 
     private final CourseService service;
@@ -189,23 +180,20 @@ public class ConsoleApp {
         return sb.append(text).toString();
     }
 
+
+    /*
+    这个方法是用来计算字符串的显示宽度的，只影响排版
+    之前的方法是打印的表格并不美观，选择的，其中涉及Unicode 区块判断，并且用 codePointAt 按码点遍历
+    我没有了解，所以用 ascii 判断
+     */
     private static int displayWidth(String text) {
         int width = 0;
-        for (int i = 0; i < text.length(); ) {
-            int codePoint = text.codePointAt(i);
-            width += isWide(codePoint) ? 2 : 1;
-            i += Character.charCount(codePoint);
+        for (int i = 0; i < text.length();i++ ) {
+            boolean ascii = text.charAt(i) <= 0x7F;
+            width += ascii ? 1 : 2;
         }
         return width;
     }
 
-    private static boolean isWide(int codePoint) {
-        return (codePoint >= 0x1100 && codePoint <= 0x115F)
-                || (codePoint >= 0x2E80 && codePoint <= 0xA4CF)
-                || (codePoint >= 0xAC00 && codePoint <= 0xD7A3)
-                || (codePoint >= 0xF900 && codePoint <= 0xFAFF)
-                || (codePoint >= 0xFE30 && codePoint <= 0xFE6F)
-                || (codePoint >= 0xFF00 && codePoint <= 0xFF60)
-                || (codePoint >= 0xFFE0 && codePoint <= 0xFFE6);
-    }
+
 }

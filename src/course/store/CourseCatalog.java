@@ -6,36 +6,10 @@ import course.model.Course;
 import java.util.ArrayList;
 import java.util.List;
 
-/*这个是用于兜底的类
-
-
-它没有实例字段、没有状态，唯一对外的东西就是 presetCourses() 这个静态方法——所以“final + 私有构造器 + 全静态方法”这套写法才成立。
-
-
-一、类上加 final 的好处
-public final class CourseCatalog 的意思是：这个类不许被继承
-
-它没有任何可扩展点。 全是静态方法和常量数据，继承它不会产生任何多态价值——子类既不能“重写”静态方法（静态方法只能被隐藏），也不能改变 presetCourses() 的行为。允许继承只会误导读者，以为这里存在扩展设计。
-
-防止“隐藏静态方法”的坑。 静态方法不参与多态。如果允许继承，子类可以声明一个同名 presetCourses() 把父类的藏起来，调用 MyCatalog.presetCourses() 和 CourseCatalog.presetCourses() 行为不同——这种“看起来像重写、其实是两个方法”的代码极难排查。final 直接堵死。
-
-防止有人往里加状态。 工具类一旦被继承，子类很可能塞进实例字段，变成“既是工具类又是对象”的混合体，语义就脏了。
-
-意图声明。 final 是写给维护者看的：“这个类的设计到此为止，不要扩展。” 这类信息靠注释容易丢，靠关键字则由编译器强制执行。
-
-
-目的是禁止继承
- */
 public final class CourseCatalog {
 
 
-/*    private CourseCatalog() {} 的作用只有一个：禁止 new CourseCatalog()。
 
-      如果不写这个构造器，Java 会送你一个默认的 public 无参构造器
-
-      目地是防止实例化
-
- */
     private CourseCatalog() {
     }
 

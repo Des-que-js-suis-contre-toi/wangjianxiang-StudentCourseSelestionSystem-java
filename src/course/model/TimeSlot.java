@@ -53,9 +53,8 @@ public class TimeSlot {
     public boolean conflictsWith(TimeSlot other) {
         if(other==null){
             return false;
-
-//            反过来看更直观：不冲突只有两种可能——“this 整个在左”（②不成立）或“this 整个在右”（①不成立）。两条同时成立，就排除了这两种情况，剩下的只能是相交或包含。
         }
+        // 这段的代码，可以类比数轴，判断两个线段是否有交集
         return day == other.day && startPeriod <= other.endPeriod && endPeriod >= other.startPeriod;
     }
 

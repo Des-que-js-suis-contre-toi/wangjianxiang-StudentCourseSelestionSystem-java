@@ -36,12 +36,13 @@ public class DataStore {
             String line = lines.get(i).replace("\uFEFF", "").trim();
             if (line.isEmpty() || line.startsWith("#"))
                 continue;
+            //原本是先将字段切好，再进行判断，但如果一行只有分隔符切出来空串length为0，然后取parts[0]就会报错,程序会崩溃
             String parts[] = line.split("[，,、]");
-            String id = parts[0].trim();
             if (parts.length != 6) {
                 System.out.println("第" + (i + 1) + "行字段数量错误，请检查");
                 continue;
             }
+            String id = parts[0].trim();
 
             try {
                 courses.add(new Course(id, parts[1].trim(),
@@ -79,6 +80,12 @@ public class DataStore {
             if(line.isEmpty() || line.startsWith("#"))
                 continue;
             String parts[] = line.split("[，,、]");
+            //parts.length == 0是为了一行只有分隔符的情况，
+            // parts.length == 1是为了一行只有一个学生ID的情况不算坏行
+            if(parts.length == 0){
+                System.out.println("第" + (i + 1) + "行字段数量错误，请检查");
+                continue;
+            }
             String studentsId = parts[0].trim();
             if(!studentsId.matches("\\d{7}")){
                 System.out.println("第" + (i + 1) + "行学生ID格式错误，请检查");
@@ -97,11 +104,25 @@ public class DataStore {
     public void saveStudentSelections(Collection<Student> students) throws IOException {
         List<String> lines = new ArrayList<>();
         lines.add("# 学号，课程编号1，课程编号2，...");
-        students.stream().
-                sorted((a,b)->a.getId().compareTo(b.getId())).
-                forEach(student->lines.add(student.getId()+
-                        (student.getCourseIds().isEmpty()?""
-                                :","+String.join(",", student.getCourseIds()))));
+        //这是使用流式操作的代码
+//        students.stream().
+//                sorted((a,b)->a.getId().compareTo(b.getId())).
+//                forEach(student->lines.add(student.getId()+
+//                        (student.getCourseIds().isEmpty()?""
+//                                :","+String.join(",", student.getCourseIds()))));
+        //这是使用集合排序的代码，都是先排序，再遍历添加
+        List<Student> ordered = new ArrayList<>(students);
+        //按学生的ID升序排序
+        ordered.sort(Comparator.comparing(Student::getId));
+        for (Student student : ordered) {
+            StringBuilder line = new StringBuilder(student.getId());
+            for (String courseId : student.getCourseIds()) {
+//                student.getCourseIds()在方法中用了Collections.unmodifiableSet但这里没有通过它对集合进行修改
+//                ，只是将它加工成字符串，不会抛出UnsupportedOperationException
+                line.append(',').append(courseId);
+            }
+            lines.add(line.toString());
+        }
 
         Files.write(studentsFile, lines, StandardCharsets.UTF_8);
 
